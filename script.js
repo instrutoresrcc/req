@@ -731,3 +731,7 @@ function pnDecidir(id, acao, motivo) {
 }
 
 document.addEventListener('DOMContentLoaded', iniciarPainel);
+
+
+
+
