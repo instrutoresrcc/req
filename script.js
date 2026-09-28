@@ -896,7 +896,8 @@ function pnCard(id, r) {
             '<button data-a="apr" style="background:var(--ok)"' + dis + '>Aprovar</button>' +
             '<button data-a="rec" style="background:var(--err)"' + dis + '>Reprovar</button>';
     } else if (est === PN_ST.APR || est === PN_ST.REC) {
-        acts = '<button data-a="can" style="background:var(--gld-dk)"' + dis + '>Cancelar</button>';
+        acts = '<input class="pn-mot" data-id="' + pnEsc(id) + '" maxlength="300" placeholder="Motivo do cancelamento (obrigatório)" value="' + pnEsc(pnDrafts[id] || '') + '" />' +
+            '<button data-a="can" style="background:var(--gld-dk)"' + dis + '>Cancelar</button>';
     } else {
         acts = '<span class="pn-final">Requerimento cancelado — finalizado, sem novas alterações.</span>';
     }
@@ -926,17 +927,15 @@ function pnDesenhar() {
 function pnClique(e) {
     var b = e.target.closest('.pn-acts button[data-a]');
     if (!b || !pnMe) return;
-    var id = b.closest('.pn-card').dataset.id, a = b.dataset.a, mot = (pnDrafts[id] || '').trim();
+    var card = b.closest('.pn-card'), id = card.dataset.id, a = b.dataset.a, mot = (pnDrafts[id] || '').trim();
     if (a === 'apr') return pnDecidir(id, PN_ST.APR, '');
-    if (a === 'rec') {
-        if (!mot) {
-            var inp = b.closest('.pn-card').querySelector('.pn-mot');
-            if (inp) { inp.classList.add('campo-erro'); inp.focus(); setTimeout(function () { inp.classList.remove('campo-erro'); }, 3000); }
-            return showToast('Motivo obrigatório', 'Informe o motivo para reprovar.', 'err');
-        }
-        return pnDecidir(id, PN_ST.REC, mot);
+    if (!mot) {
+        var inp = card.querySelector('.pn-mot');
+        if (inp) { inp.classList.add('campo-erro'); inp.focus(); setTimeout(function () { inp.classList.remove('campo-erro'); }, 3000); }
+        return showToast('Motivo obrigatório', 'Informe o motivo para ' + (a === 'rec' ? 'reprovar' : 'cancelar') + '.', 'err');
     }
-    if (a === 'can' && confirm('Cancelar este requerimento? Depois disso nada mais poderá ser alterado.')) pnDecidir(id, PN_ST.CAN, '');
+    if (a === 'rec') return pnDecidir(id, PN_ST.REC, mot);
+    if (a === 'can' && confirm('Cancelar este requerimento? Depois disso nada mais poderá ser alterado.')) pnDecidir(id, PN_ST.CAN, mot);
 }
  
 /* Transação atômica: só grava se o estado atual permitir a transição */
@@ -949,18 +948,19 @@ function pnDecidir(id, acao, motivo) {
         var est = pnEstado(cur.status);
         if (acao === PN_ST.CAN) {
             if (est !== PN_ST.APR && est !== PN_ST.REC) { bloqueado = true; return; }
-        } else {
-            if (est !== PN_ST.PEN) { bloqueado = true; return; }
-            if (acao === PN_ST.REC && !motivo) { bloqueado = true; return; }
-        }
+        } else if (est !== PN_ST.PEN) { bloqueado = true; return; }
+        if ((acao === PN_ST.REC || acao === PN_ST.CAN) && !motivo) { bloqueado = true; return; }
+
         cur.status = acao;
         cur.avaliador = pnMe.nick;
         cur.cargoAvaliador = pnMe.cargo;
         cur.dataAtualizacao = Date.now();
-        if (acao === PN_ST.REC) { cur.motivo = motivo; cur.obs = motivo; }
-        else { delete cur.motivo; delete cur.obs; }
+        if (acao === PN_ST.REC) { cur.motivo = motivo; cur.obs = motivo; delete cur.motivoCancelamento; }
+        else if (acao === PN_ST.CAN) { cur.motivoCancelamento = motivo; cur.obs = motivo; }   /* o motivo da reprovação fica preservado em cur.motivo */
+        else { delete cur.motivo; delete cur.obs; delete cur.motivoCancelamento; }
+
         var h = cur.historico || [];
-        h.push({ acao: acao, por: pnMe.nick, cargo: pnMe.cargo, em: Date.now(), motivo: acao === PN_ST.REC ? motivo : null });
+        h.push({ acao: acao, por: pnMe.nick, cargo: pnMe.cargo, em: Date.now(), motivo: (acao === PN_ST.APR) ? null : motivo });
         cur.historico = h;
         return cur;
     }, function (err, ok) {
