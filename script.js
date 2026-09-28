@@ -502,27 +502,28 @@ formIcons.painel = 'fa-solid fa-table-list';
     st.textContent = `
 .st-Pendente{--c:#f59e0b}.st-Aprovado{--c:#10b981}.st-Recusado{--c:#e5484d}.st-Cancelado{--c:#6b7280}
 
-.pc.pn-card{padding:0;overflow:hidden;border-radius:12px;background:#12295a;border:1px solid rgba(160,198,245,.16);border-top:3px solid var(--c);box-shadow:0 8px 22px rgba(0,0,0,.3);margin-bottom:16px;transition:transform .16s ease,box-shadow .16s ease}
-.pc.pn-card:hover{transform:translateY(-2px);box-shadow:0 12px 26px rgba(0,0,0,.38)}
-.pc-head{position:relative;min-height:122px;padding:14px 16px 14px 116px;color:#fff;
- background:linear-gradient(180deg,rgba(255,255,255,.1),transparent 45%),linear-gradient(135deg,#2b74e0,#1751b0)}
-.pc-avatar{position:absolute;left:6px;bottom:0;width:96px;height:122px;overflow:hidden;pointer-events:none}
-.pc-avatar img{position:absolute;top:0;left:50%;transform:translateX(-50%);width:184px;height:auto;image-rendering:pixelated}
-.pc-top{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;padding:7px 8px 7px 12px;border-radius:10px;background:rgba(0,0,0,.27);border:1px solid rgba(255,255,255,.12)}
-.pc-id{flex:0 0 auto;font-size:15px;font-weight:800}
-.pc-type{min-width:0;font-size:13px;font-weight:600;opacity:.92;overflow-wrap:anywhere}
-.pc-chip{flex:0 0 auto;margin-left:auto;padding:4px 12px;border-radius:999px;background:var(--c);color:#fff;font-size:11.5px;font-weight:800;box-shadow:inset 0 0 0 1px rgba(255,255,255,.28)}
-.pc-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
-.pc-pill{display:inline-flex;align-items:center;gap:6px;min-height:26px;padding:3px 10px;border-radius:8px;background:rgba(0,0,0,.27);font-size:12px;font-weight:600}
+.pc.pn-card{padding:0;overflow:hidden;border-radius:12px;background:linear-gradient(145deg,rgba(43,116,224,.16),transparent 42%),#12295a;border:1px solid rgba(160,198,245,.18);border-left:3px solid var(--c);box-shadow:0 6px 18px rgba(0,0,0,.24);margin-bottom:12px;transition:border-color .16s ease,box-shadow .16s ease}
+.pc.pn-card:hover{border-color:rgba(160,198,245,.32);border-left-color:var(--c);box-shadow:0 10px 24px rgba(0,0,0,.32)}
+.pc-head{display:flex;align-items:flex-start;gap:12px;padding:14px;color:#fff;background:linear-gradient(135deg,rgba(43,116,224,.32),rgba(23,81,176,.12));border-bottom:1px solid rgba(160,198,245,.12)}
+.pc-avatar{flex:0 0 48px;width:48px;height:48px;border-radius:10px;overflow:hidden;background:rgba(0,0,0,.28);display:flex;align-items:center;justify-content:center}
+.pc-avatar img{width:96px;height:auto;image-rendering:pixelated}
+.pc-head-main{flex:1;min-width:0}
+.pc-top{display:flex;align-items:center;flex-wrap:wrap;gap:6px 9px;padding:0;border:0;background:none}
+.pc-id{flex:0 0 auto;padding:3px 7px;border-radius:6px;background:rgba(0,0,0,.28);font-size:11px;font-weight:800;font-variant-numeric:tabular-nums}
+.pc-type{min-width:0;font-size:14px;font-weight:700;overflow-wrap:anywhere}
+.pc-chip{flex:0 0 auto;margin-left:auto;padding:4px 10px;border-radius:7px;background:var(--c);color:#fff;font-size:11px;font-weight:800}
+.pc-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.pc-pill{display:inline-flex;align-items:center;gap:6px;min-height:24px;padding:3px 8px;border-radius:7px;background:rgba(0,0,0,.2);color:#dceaff;font-size:11px;font-weight:600}
 .pc-pill i{font-size:11px;opacity:.75}
-.pc-body{padding:14px 16px 16px;background:linear-gradient(180deg,#12295a,#0f234e);color:#f3f7fd}
-.pc-sec{margin-top:16px}.pc-sec:first-child{margin-top:0}
-.pc-sec h4{margin-bottom:8px;font-size:10.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#93b0dc}
-.pc-row{display:grid;grid-template-columns:minmax(120px,170px) 1fr;gap:12px;padding:9px 12px;margin-bottom:6px;border-radius:10px;background:rgba(255,255,255,.055);border:1px solid rgba(160,198,245,.08);font-size:13px;line-height:1.45}
-.pc-row .k{color:#b7cdea;font-size:12px}
-.pc-row .v{color:#f3f7fd;font-weight:600;word-break:break-word}
-@media(max-width:560px){.pc-row{grid-template-columns:1fr;gap:2px}.pc-head{padding-left:104px}}
-.pc-ev{display:flex;gap:12px;align-items:flex-start;padding:11px 12px;margin-bottom:8px;border-radius:12px;background:linear-gradient(135deg,rgba(43,116,224,.28),rgba(23,81,176,.2));border:1px solid rgba(160,198,245,.1);border-left:4px solid var(--c)}
+.pc-body{padding:12px 14px 14px;background:rgba(8,24,55,.34);color:#f3f7fd}
+.pc-sec{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:14px}.pc-sec:first-child{margin-top:0}
+.pc-sec h4{grid-column:1/-1;display:flex;align-items:center;gap:8px;margin-bottom:1px;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#9fc8fb}
+.pc-sec h4:before{content:'';width:14px;height:2px;border-radius:2px;background:#5aa9ff}
+.pc-row{display:flex;flex-direction:column;gap:3px;min-width:0;padding:9px 10px;border-radius:8px;background:rgba(255,255,255,.055);border:1px solid rgba(160,198,245,.09);font-size:12px;line-height:1.45}
+.pc-row .k{color:#9fb9dc;font-size:10px;font-weight:700;text-transform:uppercase}
+.pc-row .v{color:#f3f7fd;font-weight:600;overflow-wrap:anywhere}
+@media(max-width:560px){.pc-sec{grid-template-columns:1fr}.pc-head{gap:10px;padding:12px}.pc-avatar{flex-basis:42px;width:42px;height:42px}.pc-avatar img{width:84px}.pc-chip{margin-left:0}}
+.pc-ev{display:flex;gap:10px;align-items:flex-start;padding:10px;border-radius:10px;background:rgba(255,255,255,.045);border:1px solid rgba(160,198,245,.1);border-left:3px solid var(--c)}
 .pc-ev-av{flex:0 0 40px;width:40px;height:40px;border-radius:10px;overflow:hidden;background:rgba(0,0,0,.2);display:flex;align-items:flex-end;justify-content:center}
 .pc-ev-av img{width:80px;height:auto;margin-bottom:-13px;image-rendering:pixelated}
 .pc-ev-main{flex:1;min-width:0;font-size:13px;line-height:1.5}
@@ -531,7 +532,8 @@ formIcons.painel = 'fa-solid fa-table-list';
 .pc-ev-date{display:block;color:#93b0dc;font-size:11.5px;font-variant-numeric:tabular-nums}
 .pc-ev-mot{margin-top:7px;padding:8px 10px;border-radius:8px;background:rgba(8,29,66,.62);border:1px solid rgba(160,198,245,.12);color:#b7cdea;font-size:12.5px;word-break:break-word}
 .pc-ev-mot b{color:#f3f7fd}
-.pc .pn-acts{margin-top:16px;padding-top:14px;border-top:1px solid rgba(160,198,245,.16)}
+.pc details{margin-top:12px}
+.pc .pn-acts{margin-top:12px;padding-top:12px;border-top:1px solid rgba(160,198,245,.16)}
 .pc details{font-size:12px;color:#b7cdea}
 .pc details summary{cursor:pointer;color:#9dd0ff;font-weight:700}
 .pc details pre{background:rgba(8,29,66,.72);border:1px solid rgba(160,198,245,.12);color:#f3f7fd;border-radius:8px;padding:10px;white-space:pre-wrap;word-break:break-word;max-height:180px;overflow:auto}
@@ -634,8 +636,7 @@ function pnCard(id, r) {
     var est = pnEstado(r.status), dis = pnBusy[id] ? ' disabled' : '';
 
     var pills = '<span class="pc-pill"><i class="fa-solid fa-user"></i>' + pnEsc(r.autor || '—') + '</span>' +
-        '<span class="pc-pill"><i class="fa-solid fa-calendar-days"></i>' + pnEsc(r.dataFormatada || pnDataHora(r.dataEnvio)) + '</span>' +
-        ((r.nicknames || []).length ? '<span class="pc-pill"><i class="fa-solid fa-id-badge"></i>' + pnEsc(r.nicknames.join(', ')) + '</span>' : '');
+        '<span class="pc-pill"><i class="fa-solid fa-calendar-days"></i>' + pnEsc(r.dataFormatada || pnDataHora(r.dataEnvio)) + '</span>';
 
     var campos = r.campos || {}, rows = '';
     Object.keys(campos).forEach(function (k) {
@@ -668,10 +669,10 @@ function pnCard(id, r) {
     }
 
     return '<article class="pc pn-card st-' + pnCls(est) + '" data-id="' + pnEsc(id) + '">' +
-        '<div class="pc-head"><div class="pc-avatar"><img src="' + pnAvatar(r.autor, true) + '" alt=""></div>' +
+        '<div class="pc-head"><div class="pc-avatar"><img src="' + pnAvatar(r.autor, false) + '" alt=""></div><div class="pc-head-main">' +
         '<div class="pc-top"><span class="pc-id">' + pnEsc(id) + '</span><span class="pc-type">' + pnEsc(r.titulo) + '</span>' +
         '<span class="pc-chip st-' + pnCls(est) + '">' + pnEsc(est) + '</span></div><div class="pc-pills">' + pills + '</div></div>' +
-        '<div class="pc-body">' +
+        '</div><div class="pc-body">' +
         '<div class="pc-sec"><h4>Dados do requerimento</h4>' + (rows || '<div class="pc-row"><span class="k">—</span><span class="v">Sem dados estruturados</span></div>') + '</div>' +
         (postsHtml ? '<div class="pc-sec"><h4>Postagens no fórum</h4>' + postsHtml + '</div>' : '') +
         (evs ? '<div class="pc-sec"><h4>Histórico de decisões</h4>' + evs + '</div>' : '') +
