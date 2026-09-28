@@ -488,13 +488,13 @@ var LISTAGEM_CONFIG = { databaseURL: 'https://dashboardteste-73cc6-default-rtdb.
 var PN_ST = { PEN: 'Pendente', APR: 'Aprovado', REC: 'Recusado', CAN: 'Cancelado' };
 var PN_CARGOS = { lider: 'Líder', viceLideres: 'Vice-Líder', ministros: 'Ministro', estagiarios: 'Estagiário' };
 var PN_LABELS = {
-    nicknames: 'Nickname(s)', cargoResultante: 'Cargo resultante', cargoAnterior: 'Cargo anterior/atual', cargoNovo: 'Novo cargo',
+    nicknames: 'Nickname(s)', role: 'Cargo', cargoResultante: 'Cargo resultante', cargoAnterior: 'Cargo anterior/atual', cargoNovo: 'Novo cargo',
     cargo: 'Cargo', motivo: 'Motivo(s)', permissao: 'Permissão', permissaoCompanhia: 'Permissão (Companhia)', dias: 'Quantidade de dias',
     periodo: 'Período', subgrupos: 'Subgrupos', data: 'Data', dataRegistro: 'Data do registro', corpoDestino: 'Migrando para o',
     nicknameAtual: 'Nickname atual', novoNickname: 'Novo nickname', cargoAlcancado: 'Cargo alcançado', capacitacaoNecessaria: 'Capacitação',
     tipoAdvertencia: 'Tipo', tipoCapacitacao: 'Tipo de capacitação', termosAceitos: 'Termos aceitos', observacao: 'Observação'
 };
-var dbList = null, pnMe = null, pnData = {}, pnRef = null, pnMontado = false, pnDrafts = {}, pnAbertos = {}, pnBusy = {};
+var dbList = null, pnMe = null, pnData = {}, pnBackups = {}, pnRef = null, pnMontado = false, pnDrafts = {}, pnAbertos = {}, pnBusy = {};
 
 formTitles.painel = 'Painel de gestão';
 formIcons.painel = 'fa-solid fa-table-list';
@@ -543,6 +543,29 @@ formIcons.painel = 'fa-solid fa-table-list';
 .pc .pn-acts input::placeholder{color:#93b0dc}
 .pc .pn-acts button{height:40px;padding:0 18px;border-radius:12px;box-shadow:var(--sh-xs)}
 .pn-final{font-size:12px;color:#b7cdea;font-style:italic}
+.pn-tabs{display:flex;gap:4px;margin-bottom:14px;padding:4px;border:1px solid rgba(160,198,245,.14);border-radius:10px;background:#0f234e}
+.pn-tab{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:38px;padding:0 14px;border:0;border-radius:7px;background:transparent;color:#9fb9dc;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer}
+.pn-tab.active{background:#2b74e0;color:#fff;box-shadow:0 3px 10px rgba(0,0,0,.2)}
+.pn-view[hidden]{display:none!important}
+.pn-history-section{margin-top:20px}.pn-history-section:first-child{margin-top:0}
+.pn-history-title{display:flex;align-items:center;gap:8px;margin:0 0 10px;color:#dceaff;font-size:14px;font-weight:700}
+.pn-history-title i{color:#78b8ff;font-size:13px}
+.pn-history-list{display:grid;gap:8px}
+.pn-history-card{padding:11px 12px;border:1px solid rgba(160,198,245,.14);border-left:3px solid var(--c,#5aa9ff);border-radius:9px;background:rgba(255,255,255,.045);color:#edf4ff}
+.pn-history-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.pn-history-name{min-width:0;font-size:12.5px;font-weight:700;overflow-wrap:anywhere}
+.pn-history-date{flex:0 0 auto;color:#9fb9dc;font-size:11px;font-variant-numeric:tabular-nums}
+.pn-history-meta{display:flex;flex-wrap:wrap;gap:5px 12px;margin-top:5px;color:#b7cdea;font-size:11.5px}
+.pn-history-meta span{display:inline-flex;align-items:center;gap:5px}
+.pn-history-meta i{color:#82baff;font-size:10px}
+.pn-history-detail{margin-top:8px;padding-top:8px;border-top:1px solid rgba(160,198,245,.1);color:#dceaff;font-size:12px;line-height:1.5;overflow-wrap:anywhere}
+.pn-history-detail li{margin:3px 0 0 17px}
+.pn-history-status{padding:2px 8px;border-radius:6px;background:var(--c);color:#fff;font-size:10px;font-weight:800}
+.pn-history-card details{margin-top:8px;color:#b7cdea;font-size:11.5px}
+.pn-history-card summary{cursor:pointer;color:#9dd0ff;font-weight:700}
+.pn-history-card pre{max-height:160px;overflow:auto;margin-top:6px;padding:8px;border:1px solid rgba(160,198,245,.1);border-radius:7px;background:rgba(8,29,66,.55);white-space:pre-wrap;word-break:break-word;color:#dceaff}
+.pn-history-empty{padding:18px 12px;border:1px dashed rgba(160,198,245,.18);border-radius:9px;color:#9fb9dc;text-align:center;font-size:12px}
+@media(max-width:560px){.pn-history-head{flex-direction:column;gap:3px}.pn-history-date{white-space:normal}.pn-tab{flex:1;padding:0 8px}}
 `;
     document.head.appendChild(st);
 })();
@@ -600,7 +623,7 @@ async function iniciarPainel() {
         var cargo = pnCargo(snap.val() || {}, nick);
         var panelButton = document.getElementById('navPainel');
         if (!cargo) {
-            pnMe = null; pnMontado = false; pnData = {};
+            pnMe = null; pnMontado = false; pnData = {}; pnBackups = {};
             if (pnRef) { pnRef.off(); pnRef = null; }
             if (panelButton) { panelButton.style.display = 'none'; panelButton.classList.remove('active'); }
             document.getElementById('painelRoot').innerHTML = '';
@@ -622,14 +645,41 @@ async function iniciarPainel() {
 function pnMontar() {
     pnMontado = true;
     document.getElementById('painelRoot').innerHTML =
-        '<div id="pnLista"><div class="pn-msg">Carregando...</div></div>';
+        '<div class="pn-tabs" role="tablist" aria-label="Painel e histórico">' +
+        '<button class="pn-tab active" type="button" role="tab" aria-selected="true" aria-controls="pnGestao" data-pn-view="gestao"><i class="fa-solid fa-clipboard-check"></i> Gestão</button>' +
+        '<button class="pn-tab" type="button" role="tab" aria-selected="false" aria-controls="pnHistorico" data-pn-view="historico"><i class="fa-solid fa-clock-rotate-left"></i> Histórico</button></div>' +
+        '<section class="pn-view" id="pnGestao" role="tabpanel"><div id="pnLista"><div class="pn-msg">Carregando...</div></div></section>' +
+        '<section class="pn-view" id="pnHistorico" role="tabpanel" hidden>' +
+        '<section class="pn-history-section"><h3 class="pn-history-title"><i class="fa-solid fa-envelope-open-text"></i> Requerimentos enviados</h3><div class="pn-history-list" id="pnHistoricoReq"><div class="pn-msg">Carregando...</div></div></section>' +
+        '<section class="pn-history-section"><h3 class="pn-history-title"><i class="fa-solid fa-table-list"></i> Alterações do dashboard</h3><div class="pn-history-list" id="pnHistoricoDashboard"><div class="pn-msg">Carregando backups...</div></div></section>' +
+        '</section>';
+    var root = document.getElementById('painelRoot');
+    root.addEventListener('click', function (e) {
+        var tab = e.target.closest('[data-pn-view]');
+        if (!tab) return;
+        var view = tab.dataset.pnView;
+        root.querySelectorAll('[data-pn-view]').forEach(function (item) {
+            var selected = item === tab;
+            item.classList.toggle('active', selected);
+            item.setAttribute('aria-selected', String(selected));
+        });
+        root.querySelector('#pnGestao').hidden = view !== 'gestao';
+        root.querySelector('#pnHistorico').hidden = view !== 'historico';
+        if (view === 'historico') pnRenderHistorico();
+    });
     var lista = document.getElementById('pnLista');
     lista.addEventListener('input', function (e) { if (e.target.classList.contains('pn-mot')) pnDrafts[e.target.dataset.id] = e.target.value; });
     lista.addEventListener('toggle', function (e) { var c = e.target.closest('.pn-card'); if (c && e.target.tagName === 'DETAILS') pnAbertos[c.dataset.id] = e.target.open; }, true);
     lista.addEventListener('click', pnClique);
     pnRef = firebaseDb.ref('requerimentos').orderByChild('dataEnvio').limitToLast(150);
-    pnRef.on('value', function (snap) { pnData = snap.val() || {}; pnDesenhar(); },
-        function (err) { lista.innerHTML = '<div class="pn-msg">Erro: ' + pnEsc(err.message) + '</div>'; });
+    pnRef.on('value', function (snap) { pnData = snap.val() || {}; pnDesenhar(); pnRenderHistoricoReq(); },
+        function (err) {
+            var message = '<div class="pn-msg">Erro: ' + pnEsc(err.message) + '</div>';
+            lista.innerHTML = message;
+            var history = document.getElementById('pnHistoricoReq');
+            if (history) history.innerHTML = message;
+        });
+    pnCarregarBackups();
 }
 
 function pnCard(id, r) {
@@ -678,6 +728,135 @@ function pnCard(id, r) {
         (evs ? '<div class="pc-sec"><h4>Histórico de decisões</h4>' + evs + '</div>' : '') +
         '<details' + (pnAbertos[id] ? ' open' : '') + '><summary>Ver BBCode postado</summary><pre>' + pnEsc(r.bbcode) + '</pre></details>' +
         '<div class="pn-acts">' + acts + '</div></div></article>';
+}
+
+function pnSnapshotMembers(data) {
+    var groups = { lider: 'Líder', viceLideres: 'Vice-Líder', ministros: 'Ministro', estagiarios: 'Estagiário', capacitadores: 'Capacitador', avaliadores: 'Avaliador', instrutores: 'Instrutor' };
+    var members = {};
+    Object.keys(groups).forEach(function (group) {
+        (data[group] || []).forEach(function (member) {
+            if (!member || !member.name || member.vacant) return;
+            members[pnNorm(member.name)] = { member: member, group: group, groupLabel: groups[group] };
+        });
+    });
+    return members;
+}
+
+function pnSnapshotValue(value) {
+    if (value == null || value === '') return '—';
+    if (Array.isArray(value)) return value.map(pnSnapshotValue).join(', ') || '—';
+    if (typeof value === 'object') return Object.keys(value).sort().map(function (key) {
+        return pnLabel(key) + ': ' + pnSnapshotValue(value[key]);
+    }).join(' · ');
+    return String(value);
+}
+
+function pnSnapshotStable(value) {
+    if (Array.isArray(value)) return '[' + value.map(pnSnapshotStable).join(',') + ']';
+    if (value && typeof value === 'object') return '{' + Object.keys(value).sort().map(function (key) {
+        return JSON.stringify(key) + ':' + pnSnapshotStable(value[key]);
+    }).join(',') + '}';
+    return JSON.stringify(value);
+}
+
+function pnDiffSnapshots(previous, current) {
+    var oldMembers = pnSnapshotMembers(previous), newMembers = pnSnapshotMembers(current), changes = [];
+    Object.keys(newMembers).forEach(function (key) {
+        var next = newMembers[key], before = oldMembers[key];
+        if (!before) {
+            changes.push(next.member.name + ' entrou na listagem como ' + (next.member.role || next.groupLabel) + '.');
+            return;
+        }
+        var fields = Object.keys(before.member).concat(Object.keys(next.member)).filter(function (field, index, all) {
+            return all.indexOf(field) === index && field !== 'name' && field.charAt(0) !== '_';
+        });
+        fields.forEach(function (field) {
+            if (pnSnapshotStable(before.member[field]) === pnSnapshotStable(next.member[field])) return;
+            changes.push(next.member.name + ' · ' + pnLabel(field) + ': ' + pnSnapshotValue(before.member[field]) + ' → ' + pnSnapshotValue(next.member[field]));
+        });
+        if (before.group !== next.group) changes.push(next.member.name + ' · grupo: ' + before.groupLabel + ' → ' + next.groupLabel);
+    });
+    Object.keys(oldMembers).forEach(function (key) {
+        if (!newMembers[key]) changes.push(oldMembers[key].member.name + ' saiu da listagem.');
+    });
+    ['vagas', 'links'].forEach(function (collection) {
+        var oldValues = previous[collection] || {}, newValues = current[collection] || {};
+        Object.keys(oldValues).concat(Object.keys(newValues)).filter(function (key, index, all) { return all.indexOf(key) === index; }).forEach(function (key) {
+            if (pnSnapshotStable(oldValues[key]) === pnSnapshotStable(newValues[key])) return;
+            changes.push(pnLabel(collection) + ' · ' + pnLabel(key) + ': ' + pnSnapshotValue(oldValues[key]) + ' → ' + pnSnapshotValue(newValues[key]));
+        });
+    });
+    return changes;
+}
+
+function pnRenderHistoricoReq() {
+    var container = document.getElementById('pnHistoricoReq');
+    if (!container) return;
+    var ids = Object.keys(pnData).filter(function (id) {
+        var record = pnData[id];
+        return pnNorm(record.tipo) !== 'form12' && pnNorm(record.titulo) !== pnNorm(formTitles.form12);
+    }).sort(function (a, b) { return (pnData[b].dataEnvio || 0) - (pnData[a].dataEnvio || 0); });
+    var html = ids.map(function (id) {
+        var record = pnData[id], status = pnEstado(record.status);
+        var submitted = '<div class="pn-history-meta"><span><i class="fa-solid fa-user"></i>' + pnEsc(record.autor || '—') + '</span>' +
+            '<span><i class="fa-solid fa-id-badge"></i>' + pnEsc((record.nicknames || []).join(', ') || 'Sem nickname informado') + '</span></div>';
+        var decisions = pnEventos(record).map(function (event) {
+            return '<li><b>' + pnEsc(event.acao) + '</b> por ' + pnEsc(event.por || '—') + ' (' + pnEsc(event.cargo || '—') + ') · ' + pnEsc(pnDataHora(event.em)) +
+                (event.motivo ? ' · Motivo: ' + pnEsc(event.motivo) : '') + '</li>';
+        }).join('');
+        var fields = Object.keys(record.campos || {}).filter(function (key) { return key !== 'nicknames'; }).map(function (key) {
+            return '<li><b>' + pnEsc(pnLabel(key)) + ':</b> ' + pnEsc(pnFmt(record.campos[key])) + '</li>';
+        }).join('');
+        var details = fields || decisions ? '<details><summary>Ver dados e decisões</summary><ul>' + fields + decisions + '</ul></details>' : '';
+        return '<article class="pn-history-card st-' + pnCls(status) + '"><div class="pn-history-head"><span class="pn-history-name">' + pnEsc(id) + ' · ' + pnEsc(record.titulo || 'Requerimento') + '</span>' +
+            '<span class="pn-history-date">' + pnEsc(record.dataFormatada || pnDataHora(record.dataEnvio)) + '</span></div>' +
+            '<div class="pn-history-meta"><span class="pn-history-status st-' + pnCls(status) + '">' + pnEsc(status) + '</span></div>' + submitted + details + '</article>';
+    }).join('');
+    container.innerHTML = html || '<div class="pn-history-empty">Nenhum requerimento registrado no histórico.</div>';
+}
+
+function pnRenderHistoricoDashboard() {
+    var container = document.getElementById('pnHistoricoDashboard');
+    if (!container) return;
+    var snapshots = Object.keys(pnBackups).map(function (key) {
+        var backup = pnBackups[key] || {};
+        return { key: key, backup: backup, timestamp: Number(backup.timestamp || key), data: backup.data || {} };
+    }).sort(function (a, b) { return a.timestamp - b.timestamp; });
+    if (!snapshots.length) {
+        container.innerHTML = '<div class="pn-history-empty">Nenhum backup de dashboard disponível para consulta.</div>';
+        return;
+    }
+    var html = snapshots.map(function (snapshot, index) {
+        var previous = index ? snapshots[index - 1] : null;
+        var changes = previous ? pnDiffSnapshots(previous.data, snapshot.data) : [];
+        var date = snapshot.backup.backupEm || new Date(snapshot.timestamp).toLocaleString('pt-BR');
+        var responsible = snapshot.backup.responsavel || snapshot.data.responsavel || 'Não informado';
+        var total = snapshot.backup.totalMembros || Object.keys(pnSnapshotMembers(snapshot.data)).length;
+        var list = previous
+            ? (changes.length ? '<ul>' + changes.map(function (change) { return '<li>' + pnEsc(change) + '</li>'; }).join('') + '</ul>' : '<div>Nenhuma diferença detectada desde o backup anterior.</div>')
+            : '<div>Backup inicial disponível; não há um snapshot anterior para comparação.</div>';
+        return '<article class="pn-history-card"><div class="pn-history-head"><span class="pn-history-name">Backup ' + pnEsc(snapshot.key) + '</span><span class="pn-history-date">' + pnEsc(date) + '</span></div>' +
+            '<div class="pn-history-meta"><span><i class="fa-solid fa-user"></i>Responsável: ' + pnEsc(responsible) + '</span><span><i class="fa-solid fa-users"></i>' + pnEsc(total) + ' membros</span><span>' + pnEsc(changes.length) + ' alteração(ões)</span></div>' +
+            '<details><summary>Consultar alterações deste backup</summary><div class="pn-history-detail">' + list + '</div></details></article>';
+    }).reverse().join('');
+    container.innerHTML = html;
+}
+
+function pnRenderHistorico() {
+    pnRenderHistoricoReq();
+    pnRenderHistoricoDashboard();
+}
+
+function pnCarregarBackups() {
+    var container = document.getElementById('pnHistoricoDashboard');
+    if (!container || !dbList) return;
+    container.innerHTML = '<div class="pn-history-empty">Consultando backups do dashboard...</div>';
+    dbList.ref('listagem/backups').orderByChild('timestamp').limitToLast(50).once('value').then(function (snapshot) {
+        pnBackups = snapshot.val() || {};
+        pnRenderHistoricoDashboard();
+    }).catch(function (error) {
+        container.innerHTML = '<div class="pn-history-empty">Não foi possível consultar os backups: ' + pnEsc(error.message) + '</div>';
+    });
 }
 
 function pnDesenhar() {
