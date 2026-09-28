@@ -500,23 +500,18 @@ formIcons.painel = 'fa-solid fa-table-list';
 (function () {
     var st = document.createElement('style');
     st.textContent = `
-.pn-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
-@media(max-width:640px){.pn-stats{grid-template-columns:repeat(2,1fr)}}
-.pn-stat{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-radius:12px;border:1.5px solid var(--bdr);border-left:4px solid var(--c);background:var(--in);color:var(--txt);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;transition:.15s}
-.pn-stat b{font-size:18px;font-variant-numeric:tabular-nums}
-.pn-stat:hover{transform:translateY(-1px);border-color:var(--c)}
-.pn-stat.on{background:var(--p-pale);border-color:var(--c)}
 .st-Pendente{--c:#f59e0b}.st-Aprovado{--c:#10b981}.st-Recusado{--c:#e5484d}.st-Cancelado{--c:#6b7280}
 
-.pc.pn-card{padding:0;overflow:hidden;border-radius:12px;background:#12295a;border:1px solid rgba(160,198,245,.16);box-shadow:0 8px 22px rgba(0,0,0,.3);margin-bottom:16px}
+.pc.pn-card{padding:0;overflow:hidden;border-radius:12px;background:#12295a;border:1px solid rgba(160,198,245,.16);border-top:3px solid var(--c);box-shadow:0 8px 22px rgba(0,0,0,.3);margin-bottom:16px;transition:transform .16s ease,box-shadow .16s ease}
+.pc.pn-card:hover{transform:translateY(-2px);box-shadow:0 12px 26px rgba(0,0,0,.38)}
 .pc-head{position:relative;min-height:122px;padding:14px 16px 14px 116px;color:#fff;
  background:linear-gradient(180deg,rgba(255,255,255,.1),transparent 45%),linear-gradient(135deg,#2b74e0,#1751b0)}
 .pc-avatar{position:absolute;left:6px;bottom:0;width:96px;height:122px;overflow:hidden;pointer-events:none}
 .pc-avatar img{position:absolute;top:0;left:50%;transform:translateX(-50%);width:184px;height:auto;image-rendering:pixelated}
-.pc-top{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;padding:5px 6px 5px 12px;border-radius:10px;background:rgba(0,0,0,.27);border:1px solid rgba(255,255,255,.12)}
-.pc-id{font-size:16px;font-weight:800;letter-spacing:-.1px}
-.pc-type{font-size:13px;font-weight:600;opacity:.92}
-.pc-chip{margin-left:auto;padding:4px 12px;border-radius:999px;background:var(--c);color:#fff;font-size:11.5px;font-weight:800;box-shadow:inset 0 0 0 1px rgba(255,255,255,.28)}
+.pc-top{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;padding:7px 8px 7px 12px;border-radius:10px;background:rgba(0,0,0,.27);border:1px solid rgba(255,255,255,.12)}
+.pc-id{flex:0 0 auto;font-size:15px;font-weight:800}
+.pc-type{min-width:0;font-size:13px;font-weight:600;opacity:.92;overflow-wrap:anywhere}
+.pc-chip{flex:0 0 auto;margin-left:auto;padding:4px 12px;border-radius:999px;background:var(--c);color:#fff;font-size:11.5px;font-weight:800;box-shadow:inset 0 0 0 1px rgba(255,255,255,.28)}
 .pc-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
 .pc-pill{display:inline-flex;align-items:center;gap:6px;min-height:26px;padding:3px 10px;border-radius:8px;background:rgba(0,0,0,.27);font-size:12px;font-weight:600}
 .pc-pill i{font-size:11px;opacity:.75}
@@ -618,26 +613,14 @@ async function iniciarPainel() {
         if (li) li.style.display = '';
         if (op) op.hidden = false;
         if (!pnMontado) pnMontar();
-        else { var w = document.getElementById('pnWho'); if (w) w.innerHTML = pnEsc(cargo) + ' <b>' + pnEsc(nick) + '</b>'; }
+        else pnDesenhar();
     });
 }
 
 function pnMontar() {
     pnMontado = true;
     document.getElementById('painelRoot').innerHTML =
-        '<div class="pn-stats" id="pnStats"></div>' +
-        '<div class="pn-bar"><input id="pnQ" placeholder="Buscar ID, nick ou tipo..." />' +
-        '<select id="pnF"><option value="">Todos os status</option>' + Object.keys(PN_ST).map(function (k) { return '<option>' + PN_ST[k] + '</option>'; }).join('') + '</select>' +
-        '<span class="pn-who" id="pnWho">' + pnEsc(pnMe.cargo) + ' <b>' + pnEsc(pnMe.nick) + '</b></span></div>' +
         '<div id="pnLista"><div class="pn-msg">Carregando...</div></div>';
-    document.getElementById('pnQ').addEventListener('input', pnDesenhar);
-    document.getElementById('pnF').addEventListener('change', pnDesenhar);
-    document.getElementById('pnStats').addEventListener('click', function (e) {
-        var b = e.target.closest('.pn-stat'); if (!b) return;
-        var sel = document.getElementById('pnF');
-        sel.value = (sel.value === b.dataset.s) ? '' : b.dataset.s;
-        pnDesenhar();
-    });
     var lista = document.getElementById('pnLista');
     lista.addEventListener('input', function (e) { if (e.target.classList.contains('pn-mot')) pnDrafts[e.target.dataset.id] = e.target.value; });
     lista.addEventListener('toggle', function (e) { var c = e.target.closest('.pn-card'); if (c && e.target.tagName === 'DETAILS') pnAbertos[c.dataset.id] = e.target.open; }, true);
@@ -684,7 +667,7 @@ function pnCard(id, r) {
         acts = '<span class="pn-final">Requerimento cancelado — finalizado, sem novas alterações.</span>';
     }
 
-    return '<article class="pc pn-card" data-id="' + pnEsc(id) + '">' +
+    return '<article class="pc pn-card st-' + pnCls(est) + '" data-id="' + pnEsc(id) + '">' +
         '<div class="pc-head"><div class="pc-avatar"><img src="' + pnAvatar(r.autor, true) + '" alt=""></div>' +
         '<div class="pc-top"><span class="pc-id">' + pnEsc(id) + '</span><span class="pc-type">' + pnEsc(r.titulo) + '</span>' +
         '<span class="pc-chip st-' + pnCls(est) + '">' + pnEsc(est) + '</span></div><div class="pc-pills">' + pills + '</div></div>' +
@@ -697,22 +680,9 @@ function pnCard(id, r) {
 }
 
 function pnDesenhar() {
-    var qEl = document.getElementById('pnQ'); if (!qEl) return;
-    var q = pnNorm(qEl.value), f = document.getElementById('pnF').value;
+    if (!document.getElementById('pnLista')) return;
     var ids = Object.keys(pnData).sort(function (a, b) { return (pnData[b].dataEnvio || 0) - (pnData[a].dataEnvio || 0); });
-
-    var cont = {}; Object.keys(PN_ST).forEach(function (k) { cont[PN_ST[k]] = 0; });
-    ids.forEach(function (id) { cont[pnEstado(pnData[id].status)]++; });
-    document.getElementById('pnStats').innerHTML = Object.keys(PN_ST).map(function (k) {
-        var s = PN_ST[k];
-        return '<button type="button" class="pn-stat st-' + s + (f === s ? ' on' : '') + '" data-s="' + s + '"><span>' + s + 's' + '</span><b>' + cont[s] + '</b></button>';
-    }).join('');
-
-    var html = ids.filter(function (id) {
-        var r = pnData[id];
-        if (f && pnEstado(r.status) !== f) return false;
-        return !q || pnNorm(id + ' ' + r.titulo + ' ' + r.autor + ' ' + (r.nicknames || []).join(' ')).indexOf(q) !== -1;
-    }).map(function (id) { return pnCard(id, pnData[id]); }).join('');
+    var html = ids.map(function (id) { return pnCard(id, pnData[id]); }).join('');
     document.getElementById('pnLista').innerHTML = html || '<div class="pn-msg">Nenhum requerimento encontrado.</div>';
 }
 
