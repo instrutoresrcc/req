@@ -683,7 +683,10 @@ function pnCard(id, r) {
 function pnDesenhar() {
     if (!document.getElementById('pnLista')) return;
     var ids = Object.keys(pnData).sort(function (a, b) { return (pnData[b].dataEnvio || 0) - (pnData[a].dataEnvio || 0); });
-    var html = ids.map(function (id) { return pnCard(id, pnData[id]); }).join('');
+    var html = ids.filter(function (id) {
+        var registro = pnData[id];
+        return pnNorm(registro.tipo) !== 'form12' && pnNorm(registro.titulo) !== pnNorm(formTitles.form12);
+    }).map(function (id) { return pnCard(id, pnData[id]); }).join('');
     document.getElementById('pnLista').innerHTML = html || '<div class="pn-msg">Nenhum requerimento encontrado.</div>';
 }
 
@@ -732,6 +735,7 @@ function pnDecidir(id, acao, motivo) {
 }
 
 document.addEventListener('DOMContentLoaded', iniciarPainel);
+
 
 
 
