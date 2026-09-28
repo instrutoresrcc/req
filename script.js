@@ -25,8 +25,10 @@ function toggleForm(formId) {
     document.querySelectorAll('.req-nav-list li').forEach(li => li.classList.remove('active'));
     const activeLi = document.querySelector('.req-nav-list li[data-form="'+formId+'"]');
     if (activeLi) activeLi.classList.add('active');
+    const panelButton = document.getElementById('navPainel');
+    if (panelButton) panelButton.classList.toggle('active', formId === 'painel');
     const mobileSelect = document.getElementById('reqSelectMobile');
-    if (mobileSelect) mobileSelect.value = formId;
+    if (mobileSelect) mobileSelect.value = mobileSelect.querySelector('option[value="'+formId+'"]') ? formId : '';
 }
 
 function esconderLoader() {
@@ -596,12 +598,11 @@ async function iniciarPainel() {
     if (!nick) return;
     dbList.ref('listagem/atual/data').on('value', function (snap) {
         var cargo = pnCargo(snap.val() || {}, nick);
-        var li = document.getElementById('navPainel'), op = document.getElementById('optPainel');
+        var panelButton = document.getElementById('navPainel');
         if (!cargo) {
             pnMe = null; pnMontado = false; pnData = {};
             if (pnRef) { pnRef.off(); pnRef = null; }
-            if (li) li.style.display = 'none';
-            if (op) op.hidden = true;
+            if (panelButton) { panelButton.style.display = 'none'; panelButton.classList.remove('active'); }
             document.getElementById('painelRoot').innerHTML = '';
             if (activeForm && activeForm.id === 'painel') {
                 activeForm.classList.remove('active'); activeForm = null;
@@ -612,8 +613,7 @@ async function iniciarPainel() {
             return;
         }
         pnMe = { nick: nick, cargo: cargo };
-        if (li) li.style.display = '';
-        if (op) op.hidden = false;
+        if (panelButton) panelButton.style.display = 'inline-flex';
         if (!pnMontado) pnMontar();
         else pnDesenhar();
     });
