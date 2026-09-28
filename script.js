@@ -499,10 +499,47 @@ formIcons.painel = 'fa-solid fa-table-list';
 
 (function () {
     var st = document.createElement('style');
-    st.textContent = '.s-Cancelado{background:#6b7280}.pn-grid{display:grid;grid-template-columns:minmax(120px,190px) 1fr;gap:6px 14px;font-size:13px;margin:10px 0}' +
-        '.pn-grid .k{font-weight:600;color:var(--txt2)}.pn-grid .v{word-break:break-word}' +
-        '.pn-sep{grid-column:1/-1;font-size:10.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--txt3);margin-top:6px;border-top:1px solid var(--bdr-lt);padding-top:8px}' +
-        '.pn-final{font-size:12px;color:var(--txt3);font-style:italic}';
+    st.textContent = `
+.pn-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+@media(max-width:640px){.pn-stats{grid-template-columns:repeat(2,1fr)}}
+.pn-stat{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-radius:12px;border:1.5px solid var(--bdr);border-left:4px solid var(--c);background:var(--in);color:var(--txt);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;transition:.15s}
+.pn-stat b{font-size:18px;font-variant-numeric:tabular-nums}
+.pn-stat:hover{transform:translateY(-1px);border-color:var(--c)}
+.pn-stat.on{background:var(--p-pale);border-color:var(--c)}
+.st-Pendente{--c:#f59e0b}.st-Aprovado{--c:#10b981}.st-Recusado{--c:#e5484d}.st-Cancelado{--c:#6b7280}
+
+.pc.pn-card{padding:0;overflow:hidden;border-radius:16px;background:var(--sfc);box-shadow:var(--sh-sm);margin-bottom:16px}
+.pc-head{position:relative;min-height:122px;padding:14px 16px 14px 116px;color:#fff;
+ background:linear-gradient(180deg,rgba(255,255,255,.1),transparent 45%),linear-gradient(135deg,#2b74e0,#1751b0)}
+.pc-avatar{position:absolute;left:6px;bottom:0;width:96px;height:122px;overflow:hidden;pointer-events:none}
+.pc-avatar img{position:absolute;top:0;left:50%;transform:translateX(-50%);width:184px;height:auto;image-rendering:pixelated}
+.pc-top{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;padding:5px 6px 5px 12px;border-radius:10px;background:rgba(0,0,0,.27);border:1px solid rgba(255,255,255,.12)}
+.pc-id{font-size:16px;font-weight:800;letter-spacing:-.1px}
+.pc-type{font-size:13px;font-weight:600;opacity:.92}
+.pc-chip{margin-left:auto;padding:4px 12px;border-radius:999px;background:var(--c);color:#fff;font-size:11.5px;font-weight:800;box-shadow:inset 0 0 0 1px rgba(255,255,255,.28)}
+.pc-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.pc-pill{display:inline-flex;align-items:center;gap:6px;min-height:26px;padding:3px 10px;border-radius:8px;background:rgba(0,0,0,.27);font-size:12px;font-weight:600}
+.pc-pill i{font-size:11px;opacity:.75}
+.pc-body{padding:14px 16px 16px}
+.pc-sec{margin-top:16px}.pc-sec:first-child{margin-top:0}
+.pc-sec h4{margin-bottom:8px;font-size:10.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--txt3)}
+.pc-row{display:grid;grid-template-columns:minmax(120px,170px) 1fr;gap:12px;padding:9px 12px;margin-bottom:6px;border-radius:10px;background:var(--in);font-size:13px;line-height:1.45}
+.pc-row .k{color:var(--txt2);font-size:12px}
+.pc-row .v{font-weight:600;word-break:break-word}
+@media(max-width:560px){.pc-row{grid-template-columns:1fr;gap:2px}.pc-head{padding-left:104px}}
+.pc-ev{display:flex;gap:12px;align-items:flex-start;padding:11px 12px;margin-bottom:8px;border-radius:12px;background:var(--in);border-left:4px solid var(--c)}
+.pc-ev-av{flex:0 0 40px;width:40px;height:40px;border-radius:10px;overflow:hidden;background:rgba(0,0,0,.2);display:flex;align-items:flex-end;justify-content:center}
+.pc-ev-av img{width:80px;height:auto;margin-bottom:-13px;image-rendering:pixelated}
+.pc-ev-main{flex:1;min-width:0;font-size:13px;line-height:1.5}
+.pc-ev-act{display:inline-block;padding:2px 10px;margin-right:6px;border-radius:999px;background:var(--c);color:#fff;font-size:11px;font-weight:800}
+.pc-ev-main small{color:var(--txt2)}
+.pc-ev-date{display:block;color:var(--txt3);font-size:11.5px;font-variant-numeric:tabular-nums}
+.pc-ev-mot{margin-top:7px;padding:8px 10px;border-radius:8px;background:var(--sfc);border:1px solid var(--bdr-lt);color:var(--txt2);font-size:12.5px;word-break:break-word}
+.pc-ev-mot b{color:var(--txt)}
+.pc .pn-acts{margin-top:16px;padding-top:14px;border-top:1px solid var(--bdr-lt)}
+.pc .pn-acts button{height:40px;padding:0 18px;border-radius:12px;box-shadow:var(--sh-xs)}
+.pn-final{font-size:12px;color:var(--txt3);font-style:italic}
+`;
     document.head.appendChild(st);
 })();
 
@@ -512,6 +549,21 @@ function pnCls(s) { return String(s).normalize('NFD').replace(/[\u0300-\u036f]/g
 function pnEstado(s) { return (s === PN_ST.APR || s === PN_ST.REC || s === PN_ST.CAN) ? s : PN_ST.PEN; } /* "Em análise" antigo = Pendente */
 function pnLabel(k) { return PN_LABELS[k] || k.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/^./, function (c) { return c.toUpperCase(); }); }
 function pnDataHora(t) { return t ? new Date(t).toLocaleString('pt-BR') : '—'; }
+
+function pnAvatar(nick, full) {
+    var u = encodeURIComponent(nick || '');
+    return full
+        ? 'https://www.habbo.com.br/habbo-imaging/avatarimage?user=' + u + '&action=std,crr=1&direction=2&head_direction=3&img_format=png&gesture=sml&headonly=0&size=l'
+        : 'https://www.habbo.com.br/habbo-imaging/avatarimage?img_format=png&user=' + u + '&direction=2&head_direction=2&size=m&headonly=1&gesture=sml';
+}
+
+function pnEventos(r) {
+    var ev = r.historico ? Object.keys(r.historico).sort().map(function (k) { return r.historico[k]; }) : [];
+    if (!ev.length && r.avaliador && (r.status === PN_ST.APR || r.status === PN_ST.REC || r.status === PN_ST.CAN)) {
+        ev = [{ acao: r.status, por: r.avaliador, cargo: r.cargoAvaliador, em: r.dataAtualizacao, motivo: r.obs || null }];
+    }
+    return ev;
+}
 
 function pnFmt(v) {
     if (v == null) return '';
@@ -568,12 +620,19 @@ async function iniciarPainel() {
 function pnMontar() {
     pnMontado = true;
     document.getElementById('painelRoot').innerHTML =
+        '<div class="pn-stats" id="pnStats"></div>' +
         '<div class="pn-bar"><input id="pnQ" placeholder="Buscar ID, nick ou tipo..." />' +
         '<select id="pnF"><option value="">Todos os status</option>' + Object.keys(PN_ST).map(function (k) { return '<option>' + PN_ST[k] + '</option>'; }).join('') + '</select>' +
         '<span class="pn-who" id="pnWho">' + pnEsc(pnMe.cargo) + ' <b>' + pnEsc(pnMe.nick) + '</b></span></div>' +
         '<div id="pnLista"><div class="pn-msg">Carregando...</div></div>';
     document.getElementById('pnQ').addEventListener('input', pnDesenhar);
     document.getElementById('pnF').addEventListener('change', pnDesenhar);
+    document.getElementById('pnStats').addEventListener('click', function (e) {
+        var b = e.target.closest('.pn-stat'); if (!b) return;
+        var sel = document.getElementById('pnF');
+        sel.value = (sel.value === b.dataset.s) ? '' : b.dataset.s;
+        pnDesenhar();
+    });
     var lista = document.getElementById('pnLista');
     lista.addEventListener('input', function (e) { if (e.target.classList.contains('pn-mot')) pnDrafts[e.target.dataset.id] = e.target.value; });
     lista.addEventListener('toggle', function (e) { var c = e.target.closest('.pn-card'); if (c && e.target.tagName === 'DETAILS') pnAbertos[c.dataset.id] = e.target.open; }, true);
@@ -585,22 +644,30 @@ function pnMontar() {
 
 function pnCard(id, r) {
     var est = pnEstado(r.status), dis = pnBusy[id] ? ' disabled' : '';
-    var linhas = '<div class="k">Solicitante</div><div class="v">' + pnEsc(r.autor || '—') + '</div>' +
-        '<div class="k">Enviado em</div><div class="v">' + pnEsc(r.dataFormatada || pnDataHora(r.dataEnvio)) + '</div>' +
-        '<div class="k">Tipo</div><div class="v">' + pnEsc(r.titulo || r.tipo || '—') + '</div>' +
-        '<div class="pn-sep">Dados do requerimento</div>';
-    var campos = r.campos || {};
+
+    var pills = '<span class="pc-pill"><i class="fa-solid fa-user"></i>' + pnEsc(r.autor || '—') + '</span>' +
+        '<span class="pc-pill"><i class="fa-solid fa-calendar-days"></i>' + pnEsc(r.dataFormatada || pnDataHora(r.dataEnvio)) + '</span>' +
+        ((r.nicknames || []).length ? '<span class="pc-pill"><i class="fa-solid fa-id-badge"></i>' + pnEsc(r.nicknames.join(', ')) + '</span>' : '');
+
+    var campos = r.campos || {}, rows = '';
     Object.keys(campos).forEach(function (k) {
         var t = pnFmt(campos[k]);
-        if (t !== '') linhas += '<div class="k">' + pnEsc(pnLabel(k)) + '</div><div class="v">' + pnEsc(t) + '</div>';
+        if (t !== '') rows += '<div class="pc-row"><span class="k">' + pnEsc(pnLabel(k)) + '</span><span class="v">' + pnEsc(t) + '</span></div>';
     });
+
     var posts = r.postagens ? Object.keys(r.postagens).map(function (k) { return r.postagens[k]; }) : [];
-    if (posts.length) {
-        linhas += '<div class="pn-sep">Postagens no fórum</div>' + posts.map(function (p) {
-            return '<div class="k">Tópico ' + pnEsc(p.threadId) + '</div><div class="v">' + (p.sucesso ? 'Postado' : 'Falhou: ' + pnEsc(p.erro || '')) + '</div>';
-        }).join('');
-    }
-    var acts = '';
+    var postsHtml = posts.map(function (p) {
+        return '<div class="pc-row"><span class="k">Tópico ' + pnEsc(p.threadId) + '</span><span class="v">' + (p.sucesso ? 'Postado' : 'Falhou: ' + pnEsc(p.erro || '')) + '</span></div>';
+    }).join('');
+
+    var evs = pnEventos(r).map(function (h) {
+        return '<div class="pc-ev st-' + pnCls(h.acao) + '"><span class="pc-ev-av"><img loading="lazy" src="' + pnAvatar(h.por, false) + '" alt=""></span>' +
+            '<div class="pc-ev-main"><span class="pc-ev-act">' + pnEsc(h.acao) + '</span>por <b>' + pnEsc(h.por) + '</b> <small>(' + pnEsc(h.cargo || '—') + ')</small>' +
+            '<span class="pc-ev-date">' + pnDataHora(h.em) + '</span>' +
+            (h.motivo ? '<div class="pc-ev-mot"><b>Motivo:</b> ' + pnEsc(h.motivo) + '</div>' : '') + '</div></div>';
+    }).join('');
+
+    var acts;
     if (est === PN_ST.PEN) {
         acts = '<input class="pn-mot" data-id="' + pnEsc(id) + '" maxlength="300" placeholder="Motivo (obrigatório para reprovar)" value="' + pnEsc(pnDrafts[id] || '') + '" />' +
             '<button data-a="apr" style="background:var(--ok)"' + dis + '>Aprovar</button>' +
@@ -611,21 +678,31 @@ function pnCard(id, r) {
     } else {
         acts = '<span class="pn-final">Requerimento cancelado — finalizado, sem novas alterações.</span>';
     }
-    var hist = (r.historico ? Object.keys(r.historico).sort().map(function (k) { return r.historico[k]; }) : []).map(function (h) {
-        return pnEsc(h.acao) + ' por <b>' + pnEsc(h.por) + '</b> (' + pnEsc(h.cargo || '') + ') em ' + pnDataHora(h.em) + (h.motivo ? ' — Motivo: ' + pnEsc(h.motivo) : '');
-    }).join('<br>');
-    return '<div class="pn-card" data-id="' + pnEsc(id) + '">' +
-        '<div class="pn-top"><span class="pn-id">' + pnEsc(id) + '</span><span class="pn-tt">' + pnEsc(r.titulo) + '</span><span class="pn-pill s-' + pnCls(est) + '">' + pnEsc(est) + '</span></div>' +
-        '<div class="pn-grid">' + linhas + '</div>' +
+
+    return '<article class="pc pn-card" data-id="' + pnEsc(id) + '">' +
+        '<div class="pc-head"><div class="pc-avatar"><img src="' + pnAvatar(r.autor, true) + '" alt=""></div>' +
+        '<div class="pc-top"><span class="pc-id">' + pnEsc(id) + '</span><span class="pc-type">' + pnEsc(r.titulo) + '</span>' +
+        '<span class="pc-chip st-' + pnCls(est) + '">' + pnEsc(est) + '</span></div><div class="pc-pills">' + pills + '</div></div>' +
+        '<div class="pc-body">' +
+        '<div class="pc-sec"><h4>Dados do requerimento</h4>' + (rows || '<div class="pc-row"><span class="k">—</span><span class="v">Sem dados estruturados</span></div>') + '</div>' +
+        (postsHtml ? '<div class="pc-sec"><h4>Postagens no fórum</h4>' + postsHtml + '</div>' : '') +
+        (evs ? '<div class="pc-sec"><h4>Histórico de decisões</h4>' + evs + '</div>' : '') +
         '<details' + (pnAbertos[id] ? ' open' : '') + '><summary>Ver BBCode postado</summary><pre>' + pnEsc(r.bbcode) + '</pre></details>' +
-        '<div class="pn-acts">' + acts + '</div>' +
-        (hist ? '<div class="pn-last">' + hist + '</div>' : '') + '</div>';
+        '<div class="pn-acts">' + acts + '</div></div></article>';
 }
 
 function pnDesenhar() {
     var qEl = document.getElementById('pnQ'); if (!qEl) return;
     var q = pnNorm(qEl.value), f = document.getElementById('pnF').value;
     var ids = Object.keys(pnData).sort(function (a, b) { return (pnData[b].dataEnvio || 0) - (pnData[a].dataEnvio || 0); });
+
+    var cont = {}; Object.keys(PN_ST).forEach(function (k) { cont[PN_ST[k]] = 0; });
+    ids.forEach(function (id) { cont[pnEstado(pnData[id].status)]++; });
+    document.getElementById('pnStats').innerHTML = Object.keys(PN_ST).map(function (k) {
+        var s = PN_ST[k];
+        return '<button type="button" class="pn-stat st-' + s + (f === s ? ' on' : '') + '" data-s="' + s + '"><span>' + s + 's' + '</span><b>' + cont[s] + '</b></button>';
+    }).join('');
+
     var html = ids.filter(function (id) {
         var r = pnData[id];
         if (f && pnEstado(r.status) !== f) return false;
